@@ -2,72 +2,44 @@ import {
   Injectable,
   ArgumentsHost,
   HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { DiscordService } from './discord/discord.service';
 import {
   WatchmanOptionsInterface,
   BaseServiceInterface,
   WebHookProviderEnum,
+  IException,
 } from './interfaces';
-
+import { Request, Response } from 'express';
+import BaseStrategy from './strategies/discord.strategy';
 @Injectable()
 export class WatchmanService {
-  [WebHookProviderEnum.discord];
   constructor(
     private options: Partial<WatchmanOptionsInterface>,
-    discord: DiscordService,
-  ) {
-    this[WebHookProviderEnum.discord] = discord;
+    private strategy: BaseStrategy,
+  ) {}
+
+  public setStrategy(strategy: BaseStrategy) {
+    this.strategy = strategy;
   }
 
-  private get webhook() {
-    const hook = <BaseServiceInterface>this[this.options.webHookProvider];
-    if (!hook)
-      throw new Error(
-        `webhook provider (${this.options.webHookProvider}) not supported yet`,
-      );
-    return hook;
-  }
-
-  /**
-   * @description this method sent error exeption to your webHook
-   */
-  watch(
-    exception: any,
+  public watch(
+    exception: IException,
     host: ArgumentsHost,
-    withHttpExeptions: boolean = false,
+    trackUUID?: string,
   ): void {
-
     const ctx = host.switchToHttp();
-    const request = ctx.getRequest<Request>()
-    
-    const status = 'getStatus' in exception ? exception.getStatus() :  HttpStatus.INTERNAL_SERVER_ERROR;
-      
-    if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      this.webhook
-        .post(this.options.url, {
-          errorCode: status.toString(),
-          message: exception.message,
-          errType: 'INTERNAL_SERVER_ERROR',
-          path: request?.url,
-        })
-        .subscribe();
-      return;
-    }
-
-    if(!withHttpExeptions) return;
-
-    const exceptionData = exception.getResponse();
-
-    this.webhook
-      .post(this.options.url, {
-        errorCode: exceptionData.error
-          ? exceptionData.error
-          : exceptionData.message,
-        message: exceptionData.message,
-        errType: 'HTTP_EXCEPTION',
-        path: request?.url,
-      })
-      .subscribe();
+    const request = ctx.getRequest<Request>();
+    const response = ctx.getResponse<Response>();
+    const status =
+      'getStatus' in exception
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+    if (trackUUID) exception.uuid = trackUUID;
+    if (status === HttpStatus.INTERNAL_SERVER_ERROR)
+      return this.strategy.execute(exception, true, status, request, response);
+    if (this.options.catchOnlyInternalExceptions) return;
+    return this.strategy.execute(exception, true, status, request, response);
   }
 }
