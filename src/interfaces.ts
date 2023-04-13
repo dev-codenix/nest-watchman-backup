@@ -23,7 +23,7 @@ export interface DiscordBodyInterface {
   /**
    * @description the message contents (up to 2000 characters)
    */
-  content: string;
+  content?: string;
 
   /**
    * @description override the default username of the webhook
