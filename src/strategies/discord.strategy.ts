@@ -12,14 +12,30 @@ export class DiscordBaseStrategy extends BaseStrategy {
   @Inject()
   embedBuilder: EmbedBuilder;
 
-  constructor(private webHookUrl: string) {
+  private mentioned: Array<string>;
+  /**
+   * @param webHookUrl discord webhook url
+   * @param mentionList if you want mention some use this method. note that don't use @
+   * */
+  constructor(
+    private webHookUrl: string,
+    mentionList?: Array<'here' | 'everyone' | string>,
+  ) {
     super();
+    if (mentionList) this.mention(mentionList);
   }
 
   protected send(discordBody: DiscordBodyInterface): Subscription {
     return this.httpService.post(this.webHookUrl, discordBody).subscribe();
   }
 
+  private mention(mentionList: Array<'here' | 'everyone' | string>): void {
+    this.mentioned = mentionList.map((person) =>
+      person === 'here' || person === 'everyone'
+        ? `@${person}`
+        : `@<${person}>`,
+    );
+  }
   watchMessageFormat(): DiscordBodyInterface {
     /**
      * @see {@link https://discordjs.guide/popular-topics/embeds.html#embed-preview}
@@ -51,8 +67,12 @@ export class DiscordBaseStrategy extends BaseStrategy {
       });
     if (this.exception.uuid)
       embed.addFields({ name: 'Tracking Id', value: this.exception.uuid });
-    return {
+    const discordBody: DiscordBodyInterface = {
       embeds: [embed],
     };
+    if (this.mentioned.length)
+      discordBody.content = `${this.mentioned.join(', ')}`;
+
+    return discordBody;
   }
 }
