@@ -12,7 +12,7 @@ import {
   IException,
 } from './interfaces';
 import { Request, Response } from 'express';
-import BaseStrategy from './strategies/discord.strategy';
+import { BaseStrategy } from './strategies/base.strategy';
 @Injectable()
 export class WatchmanService {
   constructor(

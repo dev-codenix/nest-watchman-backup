@@ -1,2 +1,2 @@
-import DiscordBaseStrategy from './discord.strategy';
+import { DiscordBaseStrategy } from './discord.strategy';
 export { DiscordBaseStrategy };

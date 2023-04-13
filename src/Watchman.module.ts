@@ -11,7 +11,8 @@ import {
 } from './interfaces';
 import { Watchman_OPTIONS, WATCHMAN_TOKEN } from './constants';
 import { ModuleRef } from '@nestjs/core';
-import BaseStrategy from './strategies/discord.strategy';
+import { BaseStrategy } from './strategies/base.strategy';
+import { EmbedBuilder } from 'discord.js';
 
 // const WatchmanServiceFactory = (
 //   option: Partial<WatchmanOptionsInterface>,
@@ -55,7 +56,7 @@ export class WatchmanModule {
           throw new Error('Please Provide Strategy');
         return new WatchmanService(config, strategy || config.webHookStrategy);
       },
-      inject: [Watchman_OPTIONS, options.strategy],
+      inject: [Watchman_OPTIONS, options.strategy as any],
     };
     return {
       module: WatchmanModule,
@@ -63,8 +64,9 @@ export class WatchmanModule {
       providers: [
         ...this.createAsyncProviders(options),
         provider,
-        options.strategy,
+        options.strategy as any,
         BaseStrategy,
+        EmbedBuilder,
       ],
       exports: [provider],
     };

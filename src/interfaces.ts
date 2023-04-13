@@ -1,7 +1,9 @@
 import { Observable } from 'rxjs';
 import { AxiosResponse } from 'axios';
-import { HttpException, ModuleMetadata, Provider, Type } from '@nestjs/common';
-import { DiscordBaseStrategy } from './strategies';
+import { HttpException, ModuleMetadata, Type } from '@nestjs/common';
+import { EmbedBuilder } from '@discordjs/builders';
+import { BaseStrategy } from './strategies/base.strategy';
+
 export interface WatchmanOptionsInterface {
   /**
    * @default false
@@ -43,7 +45,7 @@ export interface DiscordBodyInterface {
    * @type  array of up to 10 embed objects
    * @see {@link https://discord.com/developers/docs/resources/channel#embed-object}
    */
-  embeds?: Array<embedded>;
+  embeds?: Array<EmbedBuilder>;
 
   /**
    * @description allowed mentions for the message
@@ -155,7 +157,7 @@ export interface WatchmanModuleAsyncOptions
 }
 export interface WatchmanModuleOptions {
   catchOnlyInternalExceptions?: boolean;
-  webHookStrategy?: DiscordBaseStrategy;
+  webHookStrategy?: any;
 }
 
 export interface WatchmanModuleFactory {
