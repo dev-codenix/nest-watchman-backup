@@ -26,24 +26,32 @@ export class DiscordBaseStrategy extends BaseStrategy {
      * **/
     const embed = this.embedBuilder
       .setColor(0xff0000)
-      .setTitle('test2')
+      .setTitle(this.exception.name)
       .setFields(
-        { name: 'hello', value: 'world' },
-        { name: 'filed2', value: 'test', inline: true },
-      );
-    const mentions = ['<@3312>'];
-    const content = `${
-      this.exception.uuid ? `[__${this.exception.uuid}__]   - ` : ''
-    } ${new Date(new Date()).toLocaleString()}  ERROR [${
-      this.fileName || 'ExceptionHandler'
-    }] Route {${this.request.path}, ${this.request.method}}: ${
-      this.exception.message
-    }
-    ${this.exception.stack}
-    ${mentions.join(', ')}
-    `;
+        {
+          name: 'Occurred In',
+          value: this.fileName || 'ExceptionHandler',
+        },
+        {
+          name: 'Route',
+          value: this.request.path,
+          inline: true,
+        },
+        {
+          name: 'Http Method',
+          value: this.request.method,
+          inline: true,
+        },
+        { name: 'Trace', value: this.exception.stack },
+      )
+      .setTimestamp()
+      .setFooter({
+        text: 'Happened At ',
+        iconURL: 'https://i.imgur.com/AfFp7pu.png',
+      });
+    if (this.exception.uuid)
+      embed.addFields({ name: 'Tracking Id', value: this.exception.uuid });
     return {
-      content,
       embeds: [embed],
     };
   }
