@@ -13,9 +13,11 @@ import {
   strategyProviders,
   BaseStrategy,
 } from './strategies';
-
+// TODO able to inject custom strategy in
 @Module({})
 export class WatchmanModule {
+  //TODO: fix forRoot method in config.strategy
+
   // static forRoot(option: WatchmanModuleOptions): DynamicModule {
   //   option.catchOnlyInternalExceptions = false;
   //   const providers: Provider<any>[] = [

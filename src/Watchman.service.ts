@@ -32,4 +32,6 @@ export class WatchmanService {
     if (this.options && this.options.catchOnlyInternalExceptions) return;
     return this.strategy.execute(exception, true, status, request, response);
   }
+
+  // TODO method for error that can't be caught from exception handler
 }

@@ -5,6 +5,7 @@ import { EmbedBuilder } from 'discord.js';
 import { BaseStrategy } from './base.strategy';
 import { DiscordConfig, IDiscordBody } from '../interfaces';
 
+// TODO validate config
 @Injectable()
 export class DiscordBaseStrategy extends BaseStrategy {
   @Inject()
