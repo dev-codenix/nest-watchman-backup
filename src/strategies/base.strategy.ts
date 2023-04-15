@@ -1,11 +1,11 @@
+import { Request, Response } from 'express';
+import { Inject } from '@nestjs/common';
+import { Watchman_OPTIONS } from '../constants/provider-names';
 import {
   DiscordConfig,
   IException,
   WatchmanModuleOptions,
 } from '../interfaces';
-import { Request, Response } from 'express';
-import { Inject } from '@nestjs/common';
-import { Watchman_OPTIONS } from '../constants';
 
 export abstract class BaseStrategy {
   private _statusCode: number;

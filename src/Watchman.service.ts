@@ -1,12 +1,12 @@
 import { ArgumentsHost, HttpStatus, Injectable } from '@nestjs/common';
-import { IException, WatchmanOptionsInterface } from './interfaces';
 import { Request, Response } from 'express';
 import { BaseStrategy } from './strategies';
+import { IException, WatchmanModuleOptions } from './interfaces';
 
 @Injectable()
 export class WatchmanService {
   constructor(
-    private options: Partial<WatchmanOptionsInterface>,
+    private options: Partial<WatchmanModuleOptions>,
     private strategy: BaseStrategy,
   ) {}
 

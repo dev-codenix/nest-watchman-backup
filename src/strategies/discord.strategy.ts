@@ -1,9 +1,9 @@
-import { DiscordBodyInterface, DiscordConfig } from '../interfaces';
 import { HttpService } from '@nestjs/axios';
 import { Inject, Injectable, Optional } from '@nestjs/common';
 import { Subscription } from 'rxjs';
 import { EmbedBuilder } from 'discord.js';
 import { BaseStrategy } from './base.strategy';
+import { DiscordConfig, IDiscordBody } from '../interfaces';
 
 @Injectable()
 export class DiscordBaseStrategy extends BaseStrategy {
@@ -23,7 +23,7 @@ export class DiscordBaseStrategy extends BaseStrategy {
     if (discordConfig) this.config = discordConfig;
   }
 
-  protected send(discordBody: DiscordBodyInterface): Subscription {
+  protected send(discordBody: IDiscordBody): Subscription {
     return this.httpService
       .post(this.config.webHookUrl, discordBody)
       .subscribe();
@@ -38,7 +38,7 @@ export class DiscordBaseStrategy extends BaseStrategy {
       )
       .join(', ');
   }
-  watchMessageFormat(): DiscordBodyInterface {
+  watchMessageFormat(): IDiscordBody {
     /**
      * @see {@link https://discordjs.guide/popular-topics/embeds.html#embed-preview}
      * **/
@@ -72,7 +72,7 @@ export class DiscordBaseStrategy extends BaseStrategy {
       });
     if (this.exception.uuid)
       embed.addFields({ name: 'Tracking Id', value: this.exception.uuid });
-    const discordBody: DiscordBodyInterface = {
+    const discordBody: IDiscordBody = {
       embeds: [embed],
     };
     if (this.config.mentionList && this.config.mentionList.length)
