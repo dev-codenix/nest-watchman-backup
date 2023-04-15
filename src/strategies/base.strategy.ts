@@ -1,6 +1,12 @@
-import { DiscordBodyInterface, IException } from '../interfaces';
+import {
+  DiscordConfig,
+  IException,
+  WatchmanModuleOptions,
+} from '../interfaces';
 import { Request, Response } from 'express';
-import { Injectable } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
+import { Watchman_OPTIONS } from '../constants';
+
 export abstract class BaseStrategy {
   private _statusCode: number;
   private _exception: IException;
@@ -8,7 +14,13 @@ export abstract class BaseStrategy {
   private _response: Response;
   private _filePath: string;
   private _fileName: string;
-  private _config;
+
+  @Inject(Watchman_OPTIONS)
+  private _options: WatchmanModuleOptions = {
+    strategyConfig: null,
+    catchOnlyInternalExceptions: false,
+  };
+  private strategyConfig;
   execute(
     exception: IException,
     fromWatch: boolean,
@@ -25,7 +37,6 @@ export abstract class BaseStrategy {
       this._fileName =
         this._filePath && this.extractErrorFileNameFromPath(this._filePath);
       const message = this[`${fromWatch ? 'watch' : ''}MessageFormat`]();
-      console.log('before sent');
       this.send(message);
     }
   }
@@ -47,11 +58,12 @@ export abstract class BaseStrategy {
   get fileName(): string {
     return this._fileName;
   }
-  get config() {
-    return this._config;
+  get config(): DiscordConfig {
+    if (!this.strategyConfig) return this._options.strategyConfig;
+    return this.strategyConfig;
   }
   set config(config) {
-    this._config = config;
+    this.strategyConfig = config;
   }
   private extractErrorFileNameFromPath(path: string): string | null {
     return (
@@ -75,7 +87,7 @@ export abstract class BaseStrategy {
     }
     return path || null;
   }
+  private validateRequiredConfig() {}
   protected abstract send(messageBody): unknown;
   abstract watchMessageFormat(): unknown;
-  abstract get instanceName(): string;
 }

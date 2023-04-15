@@ -50,17 +50,17 @@ export class WatchmanModule {
         if (!options.strategy) {
           if (!config.strategyConfig)
             throw new Error('Please set your config in strategyConfig object');
-          loadedStrategy.config = config.strategyConfig;
         }
 
         return new WatchmanService(config, loadedStrategy);
       },
       inject: [
-        Watchman_OPTIONS,
+        { token: Watchman_OPTIONS, optional: true },
         { token: STRATEGY_TOKEN, optional: true },
         ...injectStrategies,
       ],
     };
+
     return {
       module: WatchmanModule,
       imports: [...(options.imports || []), HttpModule],
@@ -86,12 +86,19 @@ export class WatchmanModule {
     }
 
     const useClass = options.useClass as Type<WatchmanModuleFactory>;
+    if (useClass)
+      return [
+        this.createAsyncOptionsProvider(options),
+        {
+          provide: useClass,
+          useClass,
+        },
+      ];
 
     return [
-      this.createAsyncOptionsProvider(options),
       {
-        provide: useClass,
-        useClass,
+        provide: Watchman_OPTIONS,
+        useValue: null,
       },
     ];
   }

@@ -1,7 +1,7 @@
 import { ArgumentsHost, HttpStatus, Injectable } from '@nestjs/common';
 import { IException, WatchmanOptionsInterface } from './interfaces';
 import { Request, Response } from 'express';
-import { BaseStrategy } from './strategies/base.strategy';
+import { BaseStrategy } from './strategies';
 
 @Injectable()
 export class WatchmanService {
@@ -19,7 +19,6 @@ export class WatchmanService {
     host: ArgumentsHost,
     trackUUID?: string,
   ): void {
-    console.log(this.strategy.execute);
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
@@ -30,7 +29,7 @@ export class WatchmanService {
     if (trackUUID) exception.uuid = trackUUID;
     if (status === HttpStatus.INTERNAL_SERVER_ERROR)
       return this.strategy.execute(exception, true, status, request, response);
-    if (this.options.catchOnlyInternalExceptions) return;
+    if (this.options && this.options.catchOnlyInternalExceptions) return;
     return this.strategy.execute(exception, true, status, request, response);
   }
 }

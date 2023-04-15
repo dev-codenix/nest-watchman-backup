@@ -6,19 +6,13 @@ import {
 import { DiscordBaseStrategy } from './discord.strategy';
 import { BaseStrategy } from './base.strategy';
 import { EmbedBuilder } from 'discord.js';
-import { HttpService } from '@nestjs/axios';
+
 // export from here to access locally
 export { DiscordBaseStrategy, BaseStrategy };
 export const injectStrategies: Array<
   InjectionToken | OptionalFactoryDependency
-> = [DiscordBaseStrategy.name];
-export const strategyProviders: Array<Provider<any>> = [
-  {
-    provide: DiscordBaseStrategy.name,
-    useClass: DiscordBaseStrategy,
-    inject: [EmbedBuilder.name, HttpService],
-  },
-];
+> = [DiscordBaseStrategy];
+export const strategyProviders: Array<Provider<any>> = [DiscordBaseStrategy];
 
 export const strategyDependenciesProviders: Array<Provider<any>> = [
   {
