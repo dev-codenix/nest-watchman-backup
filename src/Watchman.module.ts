@@ -14,6 +14,7 @@ import {
   BaseStrategy,
 } from './strategies';
 // TODO able to inject custom strategy in
+// TODO test useClass injection
 @Module({})
 export class WatchmanModule {
   //TODO: fix forRoot method in config.strategy
