@@ -1,36 +1,41 @@
-import { DiscordBodyInterface } from '../interfaces';
+import { DiscordBodyInterface, DiscordConfig } from '../interfaces';
 import { HttpService } from '@nestjs/axios';
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { Subscription } from 'rxjs';
 import { EmbedBuilder } from 'discord.js';
 import { BaseStrategy } from './base.strategy';
-
+import { ModuleRef } from '@nestjs/core';
 export class DiscordBaseStrategy extends BaseStrategy {
   @Inject()
   private httpService: HttpService;
 
-  @Inject()
+  @Inject(EmbedBuilder.name)
   embedBuilder: EmbedBuilder;
 
-  private mentioned: Array<string>;
+  private _mentioned: Array<string> = [];
   /**
    * @param webHookUrl discord webhook url
    * @param mentionList if you want mention some use this method. note that don't use @
    * */
   constructor(
-    private webHookUrl: string,
-    mentionList?: Array<'here' | 'everyone' | string>,
+    private webHookUrl?: string,
+    private mentionList?: Array<'here' | 'everyone' | string>,
   ) {
     super();
+    console.log('mentionList', mentionList);
     if (mentionList) this.mention(mentionList);
   }
 
   protected send(discordBody: DiscordBodyInterface): Subscription {
-    return this.httpService.post(this.webHookUrl, discordBody).subscribe();
+    console.log('httpService', this.httpService);
+    console.log('config', this.config);
+    return this.httpService
+      .post(this.webHookUrl || this.config.webHookUrl, discordBody)
+      .subscribe();
   }
 
   private mention(mentionList: Array<'here' | 'everyone' | string>): void {
-    this.mentioned = mentionList.map((person) =>
+    this._mentioned = mentionList.map((person) =>
       person === 'here' || person === 'everyone'
         ? `@${person}`
         : `@<${person}>`,
@@ -70,9 +75,13 @@ export class DiscordBaseStrategy extends BaseStrategy {
     const discordBody: DiscordBodyInterface = {
       embeds: [embed],
     };
-    if (this.mentioned.length)
-      discordBody.content = `${this.mentioned.join(', ')}`;
+    if (this._mentioned.length)
+      discordBody.content = `${this._mentioned.join(', ')}`;
 
     return discordBody;
+  }
+
+  get instanceName(): string {
+    return DiscordBaseStrategy.name;
   }
 }

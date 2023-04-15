@@ -1,30 +1,19 @@
-import { DiscordService } from './discord/discord.service';
 import { HttpModule } from '@nestjs/axios';
-import { DynamicModule, Global, Module, Provider, Type } from '@nestjs/common';
-import { DiscordModule } from './discord/discord.module';
+import { DynamicModule, Module, Provider, Type } from '@nestjs/common';
 import { WatchmanService } from './Watchman.service';
 import {
   WatchmanModuleAsyncOptions,
   WatchmanModuleFactory,
   WatchmanModuleOptions,
-  WatchmanOptionsInterface,
 } from './interfaces';
-import { Watchman_OPTIONS, WATCHMAN_TOKEN } from './constants';
-import { ModuleRef } from '@nestjs/core';
-import { BaseStrategy } from './strategies/base.strategy';
-import { EmbedBuilder } from 'discord.js';
+import { STRATEGY_TOKEN, Watchman_OPTIONS } from './constants';
+import {
+  injectStrategies,
+  strategyDependenciesProviders,
+  strategyProviders,
+  BaseStrategy,
+} from './strategies';
 
-// const WatchmanServiceFactory = (
-//   option: Partial<WatchmanOptionsInterface>,
-// ): Provider<any> => {
-//   return {
-//     provide: WatchmanService,
-//     useFactory: () => {
-//       return new WatchmanService(option);
-//     },
-//     inject: [DiscordService],
-//   };
-// };
 @Module({})
 export class WatchmanModule {
   // static forRoot(option: WatchmanModuleOptions): DynamicModule {
@@ -50,13 +39,27 @@ export class WatchmanModule {
       provide: WatchmanService,
       useFactory: async (
         config: WatchmanModuleOptions,
-        strategy: BaseStrategy,
+        ...args: BaseStrategy[]
       ) => {
-        if (!strategy && !config.webHookStrategy)
-          throw new Error('Please Provide Strategy');
-        return new WatchmanService(config, strategy || config.webHookStrategy);
+        const strategy = options.strategy || config.strategy;
+        if (!strategy) throw new Error('Please Provide Strategy class');
+        const loadedStrategy = args.find(
+          (injectedStrategy) =>
+            injectedStrategy && injectedStrategy instanceof strategy,
+        );
+        if (!options.strategy) {
+          if (!config.strategyConfig)
+            throw new Error('Please set your config in strategyConfig object');
+          loadedStrategy.config = config.strategyConfig;
+        }
+
+        return new WatchmanService(config, loadedStrategy);
       },
-      inject: [Watchman_OPTIONS, options.strategy as any],
+      inject: [
+        Watchman_OPTIONS,
+        { token: STRATEGY_TOKEN, optional: true },
+        ...injectStrategies,
+      ],
     };
     return {
       module: WatchmanModule,
@@ -64,13 +67,17 @@ export class WatchmanModule {
       providers: [
         ...this.createAsyncProviders(options),
         provider,
-        options.strategy as any,
-        BaseStrategy,
-        EmbedBuilder,
+        ...strategyProviders,
+        ...strategyDependenciesProviders,
+        {
+          provide: STRATEGY_TOKEN,
+          useClass: options.strategy,
+        },
       ],
       exports: [provider],
     };
   }
+
   private static createAsyncProviders(
     options: WatchmanModuleAsyncOptions,
   ): Provider[] {
@@ -88,6 +95,7 @@ export class WatchmanModule {
       },
     ];
   }
+
   private static createAsyncOptionsProvider(
     options: WatchmanModuleAsyncOptions,
   ): Provider {

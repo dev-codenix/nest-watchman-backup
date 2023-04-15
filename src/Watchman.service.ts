@@ -1,18 +1,8 @@
-import {
-  Injectable,
-  ArgumentsHost,
-  HttpStatus,
-  HttpException,
-} from '@nestjs/common';
-import { DiscordService } from './discord/discord.service';
-import {
-  WatchmanOptionsInterface,
-  BaseServiceInterface,
-  WebHookProviderEnum,
-  IException,
-} from './interfaces';
+import { ArgumentsHost, HttpStatus, Injectable } from '@nestjs/common';
+import { IException, WatchmanOptionsInterface } from './interfaces';
 import { Request, Response } from 'express';
 import { BaseStrategy } from './strategies/base.strategy';
+
 @Injectable()
 export class WatchmanService {
   constructor(
@@ -29,6 +19,7 @@ export class WatchmanService {
     host: ArgumentsHost,
     trackUUID?: string,
   ): void {
+    console.log(this.strategy.execute);
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();

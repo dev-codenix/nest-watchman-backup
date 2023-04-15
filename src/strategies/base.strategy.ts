@@ -1,6 +1,6 @@
 import { DiscordBodyInterface, IException } from '../interfaces';
 import { Request, Response } from 'express';
-
+import { Injectable } from '@nestjs/common';
 export abstract class BaseStrategy {
   private _statusCode: number;
   private _exception: IException;
@@ -8,7 +8,7 @@ export abstract class BaseStrategy {
   private _response: Response;
   private _filePath: string;
   private _fileName: string;
-
+  private _config;
   execute(
     exception: IException,
     fromWatch: boolean,
@@ -24,8 +24,8 @@ export abstract class BaseStrategy {
       this._filePath = this.extractErrorPath(this._exception.stack);
       this._fileName =
         this._filePath && this.extractErrorFileNameFromPath(this._filePath);
-      const message: DiscordBodyInterface =
-        this[`${fromWatch ? 'watch' : ''}MessageFormat`]();
+      const message = this[`${fromWatch ? 'watch' : ''}MessageFormat`]();
+      console.log('before sent');
       this.send(message);
     }
   }
@@ -46,6 +46,12 @@ export abstract class BaseStrategy {
   }
   get fileName(): string {
     return this._fileName;
+  }
+  get config() {
+    return this._config;
+  }
+  set config(config) {
+    this._config = config;
   }
   private extractErrorFileNameFromPath(path: string): string | null {
     return (
@@ -69,6 +75,7 @@ export abstract class BaseStrategy {
     }
     return path || null;
   }
-  protected abstract send(messageBody: unknown): unknown;
+  protected abstract send(messageBody): unknown;
   abstract watchMessageFormat(): unknown;
+  abstract get instanceName(): string;
 }

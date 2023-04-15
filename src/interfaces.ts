@@ -80,6 +80,11 @@ export interface DiscordBodyInterface {
   attachments?: any;
 }
 
+export interface DiscordConfig {
+  webHookUrl: string;
+  mentionList?: Array<'here' | 'everyone' | string>;
+}
+
 export enum Allowed_Mention_Types {
   RoleMentions = 'roles', //	Controls role mentions
   UserMentions = 'users', //	Controls user mentions
@@ -147,7 +152,7 @@ export type IException = HttpException & UUID;
 
 export interface WatchmanModuleAsyncOptions
   extends Pick<ModuleMetadata, 'imports'> {
-  strategy: any;
+  strategy?: any;
   inject?: any[];
   useClass?: Type<WatchmanModuleFactory>;
   useExisting?: Type<WatchmanModuleFactory>;
@@ -157,7 +162,8 @@ export interface WatchmanModuleAsyncOptions
 }
 export interface WatchmanModuleOptions {
   catchOnlyInternalExceptions?: boolean;
-  webHookStrategy?: any;
+  strategy?: any;
+  strategyConfig?: DiscordConfig;
 }
 
 export interface WatchmanModuleFactory {
