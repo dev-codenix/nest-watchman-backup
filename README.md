@@ -1,4 +1,4 @@
-
+[//]: # (TODO update readme)
 ## Description
 
 [Watchman](https://github.com/nestjs/nest) is an error cather for Nest framework.
@@ -8,7 +8,22 @@
 ```bash
 $ npm install @devcodenix/nest-watchman
 ```
-
+## Usage
+#### in ExceptionFilter 
+```ts
+// all-exception-filter.ts 
+constructor(private watchManService: WatchmanService) {
+  super();
+}
+ public catch(exception: any, host: ArgumentsHost): void {
+  this.watchManService.watch(exception,host,'uuid');
+  ...
+}
+```
+#### where ever you want
+```ts
+this.watchManService.watch(exception,null,'uuid');
+```
 ## Module Configuration
 ### Main config properties
 - `strategy`
@@ -94,8 +109,11 @@ export class DiscordStrategy extends DiscordBaseStrategy {
       mentionList: ["here"]
     });
   }
-  watchMessageFormat(): IDiscordBody {
-    return super.watchMessageFormat();
+  withMetaDataMessageFormat(): IDiscordBody {
+    return super.withMetaDataMessageFormat();
+  }
+  simpleMessageFormat(): IDiscordBody {
+    return super.simpleMessageFormat();
   }
 }
 ```

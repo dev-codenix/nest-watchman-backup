@@ -1,7 +1,12 @@
-import { ArgumentsHost, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { BaseStrategy } from './strategies';
-import { IException, WatchmanModuleOptions } from './interfaces';
+import {
+  IException,
+  WatchData,
+  WatchmanModuleOptions,
+  WatchMetaData,
+} from './interfaces';
 
 @Injectable()
 export class WatchmanService {
@@ -14,24 +19,24 @@ export class WatchmanService {
     this.strategy = strategy;
   }
 
-  public watch(
-    exception: IException,
-    host: ArgumentsHost,
-    trackUUID?: string,
-  ): void {
-    const ctx = host.switchToHttp();
-    const request = ctx.getRequest<Request>();
-    const response = ctx.getResponse<Response>();
+  public watch(exception: IException, data: WatchData): void {
+    const { host, trackUUID, metaData } = data;
+    let _host: WatchMetaData = null;
+    if (host) {
+      const ctx = host.switchToHttp();
+      _host = {
+        request: ctx.getRequest<Request>(),
+        response: ctx.getResponse<Response>(),
+      };
+    }
     const status =
       'getStatus' in exception
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
     if (trackUUID) exception.uuid = trackUUID;
     if (status === HttpStatus.INTERNAL_SERVER_ERROR)
-      return this.strategy.execute(exception, true, status, request, response);
+      return this.strategy.execute(exception, status, _host, metaData);
     if (this.options && this.options.catchOnlyInternalExceptions) return;
-    return this.strategy.execute(exception, true, status, request, response);
+    return this.strategy.execute(exception, status, _host, metaData);
   }
-
-  // TODO method for error that can't be caught from exception handler
 }

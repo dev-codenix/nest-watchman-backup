@@ -1,5 +1,6 @@
-import { ModuleMetadata, Type } from '@nestjs/common';
+import { ArgumentsHost, ModuleMetadata, Type } from '@nestjs/common';
 import { DiscordConfig } from './discord.interface';
+import { Request, Response } from 'express';
 
 export interface WatchmanModuleAsyncOptions
   extends Pick<ModuleMetadata, 'imports'> {
@@ -22,4 +23,15 @@ export interface WatchmanModuleFactory {
   createWatchmanModuleOptions: () =>
     | Promise<WatchmanModuleOptions>
     | WatchmanModuleOptions;
+}
+
+export interface WatchMetaData {
+  request: Request;
+  response: Response;
+}
+
+export interface WatchData {
+  host?: ArgumentsHost | null;
+  trackUUID?: string | null;
+  metaData?: any;
 }

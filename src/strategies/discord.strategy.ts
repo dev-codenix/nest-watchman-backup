@@ -24,13 +24,14 @@ export class DiscordBaseStrategy extends BaseStrategy {
     if (discordConfig) this.config = discordConfig;
   }
 
-  protected send(discordBody: IDiscordBody): Subscription {
+  send(discordBody: IDiscordBody): Subscription {
     return this.httpService
       .post(this.config.webHookUrl, discordBody)
       .subscribe();
   }
 
   private mention(mentionList: Array<'here' | 'everyone' | string>): string {
+    // TODO mention people in channel
     return mentionList
       .map((person) =>
         person === 'here' || person === 'everyone'
@@ -39,7 +40,7 @@ export class DiscordBaseStrategy extends BaseStrategy {
       )
       .join(', ');
   }
-  watchMessageFormat(): IDiscordBody {
+  withHostMessageFormat(): IDiscordBody {
     /**
      * @see {@link https://discordjs.guide/popular-topics/embeds.html#embed-preview}
      * **/
@@ -60,6 +61,38 @@ export class DiscordBaseStrategy extends BaseStrategy {
           name: 'Http Method',
           value: this.request.method,
           inline: true,
+        },
+        {
+          name: 'Trace',
+          value: this.exception?.stack.slice(0, 1020) + '...',
+        },
+      )
+      .setTimestamp()
+      .setFooter({
+        text: 'Happened At ',
+        iconURL: 'https://i.imgur.com/AfFp7pu.png',
+      });
+    if (this.exception.uuid)
+      embed.addFields({ name: 'Tracking Id', value: this.exception.uuid });
+    const discordBody: IDiscordBody = {
+      embeds: [embed],
+    };
+    if (this.config.mentionList && this.config.mentionList.length)
+      discordBody.content = this.mention(this.config.mentionList);
+    return discordBody;
+  }
+
+  simpleMessageFormat(): IDiscordBody {
+    /**
+     * @see {@link https://discordjs.guide/popular-topics/embeds.html#embed-preview}
+     * **/
+    const embed = this.embedBuilder
+      .setColor(0xff0000)
+      .setTitle(this.exception.name)
+      .setFields(
+        {
+          name: 'Occurred In',
+          value: this.fileName || 'ExceptionHandler',
         },
         {
           name: 'Trace',

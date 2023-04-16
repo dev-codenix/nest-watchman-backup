@@ -8,12 +8,12 @@ import {
 } from './interfaces';
 import { STRATEGY_TOKEN, Watchman_OPTIONS } from './constants';
 import {
+  BaseStrategy,
   injectStrategies,
   strategyDependenciesProviders,
   strategyProviders,
-  BaseStrategy,
 } from './strategies';
-// TODO able to inject custom strategy in
+
 // TODO test useClass injection
 @Module({})
 export class WatchmanModule {
