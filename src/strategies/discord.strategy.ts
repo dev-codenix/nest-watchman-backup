@@ -31,12 +31,11 @@ export class DiscordBaseStrategy extends BaseStrategy {
   }
 
   private mention(mentionList: Array<'here' | 'everyone' | string>): string {
-    // TODO mention people in channel
     return mentionList
       .map((person) =>
         person === 'here' || person === 'everyone'
           ? `@${person}`
-          : `@<${person}>`,
+          : `<@${person}>`,
       )
       .join(', ');
   }

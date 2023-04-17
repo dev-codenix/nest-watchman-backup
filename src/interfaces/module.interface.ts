@@ -15,7 +15,6 @@ export interface WatchmanModuleAsyncOptions
 export interface WatchmanModuleOptions {
   catchOnlyInternalExceptions?: boolean;
   strategy?: any;
-  // TODO select config base on strategy type
   strategyConfig?: DiscordConfig;
 }
 

@@ -2,6 +2,10 @@ import { EmbedBuilder } from '@discordjs/builders';
 
 export interface DiscordConfig {
   webHookUrl: string;
+  /**
+   * @description you can use "here" and "everyone" to mention or set a user id to mention persons
+   * @see  {@link https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID- Where can I find my User Server Message ID}
+   * */
   mentionList?: Array<'here' | 'everyone' | string>;
 }
 
