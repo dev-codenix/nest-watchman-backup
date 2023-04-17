@@ -8,6 +8,7 @@ import {
   WatchMetaData,
 } from '../interfaces';
 
+type StrategyConfig = WatchmanModuleOptions['strategyConfig'];
 export abstract class BaseStrategy {
   private _statusCode: number;
   private _exception: IException;
@@ -16,7 +17,7 @@ export abstract class BaseStrategy {
   private _filePath: string;
   private _fileName: string;
   private _metaData: any;
-  private strategyConfig;
+  private strategyConfig: StrategyConfig;
 
   @Inject(Watchman_OPTIONS)
   private _options: WatchmanModuleOptions = {
@@ -74,12 +75,12 @@ export abstract class BaseStrategy {
     return this._fileName;
   }
 
-  get config(): DiscordConfig {
+  get config(): StrategyConfig {
     if (!this.strategyConfig) return this._options.strategyConfig;
     return this.strategyConfig;
   }
 
-  set config(config) {
+  set config(config: StrategyConfig) {
     this.strategyConfig = config;
   }
 

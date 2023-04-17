@@ -17,26 +17,34 @@ import {
 // TODO test useClass injection
 @Module({})
 export class WatchmanModule {
-  //TODO: fix forRoot method in config.strategy
+  static forRoot(option: WatchmanModuleOptions): DynamicModule {
+    const provider: Provider<any> = {
+      provide: WatchmanService,
+      useFactory: (config: WatchmanModuleOptions, ...args: BaseStrategy[]) => {
+        if (!option.strategy) throw new Error('Please Provide Strategy class');
+        const loadedStrategy = args.find(
+          (injectedStrategy) =>
+            injectedStrategy && injectedStrategy instanceof option.strategy,
+        );
+        if (!config.strategyConfig)
+          throw new Error('Please set your config in strategyConfig object');
+        return new WatchmanService(config, loadedStrategy);
+      },
+      inject: [Watchman_OPTIONS, ...injectStrategies],
+    };
 
-  // static forRoot(option: WatchmanModuleOptions): DynamicModule {
-  //   option.catchOnlyInternalExceptions = false;
-  //   const providers: Provider<any>[] = [
-  //     {
-  //       provide: WatchmanService,
-  //       useFactory: () => {
-  //         return new WatchmanService(option, option.strategy);
-  //       },
-  //       inject: [DiscordService],
-  //     },
-  //   ];
-  //   return {
-  //     providers: providers,
-  //     exports: providers,
-  //     module: WatchmanModule,
-  //     // imports: [HttpModule],
-  //   };
-  // }
+    return {
+      providers: [
+        provider,
+        { provide: Watchman_OPTIONS, useValue: option },
+        ...strategyDependenciesProviders,
+        ...strategyProviders,
+      ],
+      exports: [provider],
+      module: WatchmanModule,
+      imports: [HttpModule],
+    };
+  }
   static forRootAsync(options: WatchmanModuleAsyncOptions): DynamicModule {
     const provider: Provider = {
       provide: WatchmanService,
