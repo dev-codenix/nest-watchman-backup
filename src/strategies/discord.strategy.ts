@@ -14,11 +14,6 @@ export class DiscordBaseStrategy extends BaseStrategy {
   @Inject(EmbedBuilder.name)
   embedBuilder: EmbedBuilder;
 
-  /**
-   * @param discordConfig
-   * @param discordConfig.webHookUrl discord webhook url
-   * @param discordConfig.mentionList if you want mention some use this method. note that don't use @
-   * */
   constructor(@Optional() discordConfig?: DiscordConfig) {
     super();
     if (discordConfig) this.config = discordConfig;
