@@ -40,9 +40,6 @@ export class DiscordBaseStrategy extends BaseStrategy {
       .join(', ');
   }
   withHostMessageFormat(): IDiscordBody {
-    /**
-     * @see {@link https://discordjs.guide/popular-topics/embeds.html#embed-preview}
-     * **/
     const embed = this.embedBuilder
       .setColor(0xff0000)
       .setTitle(this.exception.name)

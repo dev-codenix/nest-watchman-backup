@@ -31,9 +31,10 @@ export interface IDiscordBody {
   tts?: boolean;
 
   /**
-   * @description embedded rich content
-   * @type  array of up to 10 embed objects
-   * @see {@link https://discord.com/developers/docs/resources/channel#embed-object}
+   * @description message can be generated in embeds
+   * @overview Array of up to 10 embed objects
+   * @see {@link https://discord.com/developers/docs/resources/channel#embed-object Embed Object Structure}
+   * @see {@link https://discordjs.guide/popular-topics/embeds.html#embed-preview How To Generate Embeds With EmbedBuilder Class}
    */
   embeds?: Array<EmbedBuilder | Embedded>;
 
