@@ -16,13 +16,13 @@ export abstract class BaseStrategy {
   private _filePath: string;
   private _fileName: string;
   private _metaData: any;
+  private strategyConfig;
 
   @Inject(Watchman_OPTIONS)
   private _options: WatchmanModuleOptions = {
     strategyConfig: null,
     catchOnlyInternalExceptions: false,
   };
-  private strategyConfig;
 
   execute(
     exception: IException,
@@ -106,8 +106,6 @@ export abstract class BaseStrategy {
     }
     return path || null;
   }
-
-  private validateRequiredConfig() {}
 
   abstract send(messageBody): unknown;
 
