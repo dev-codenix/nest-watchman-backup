@@ -14,7 +14,6 @@ import {
   strategyProviders,
 } from './strategies';
 
-// TODO test useClass injection
 @Module({})
 export class WatchmanModule {
   static forRoot(option: WatchmanModuleOptions): DynamicModule {

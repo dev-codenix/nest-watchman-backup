@@ -4,7 +4,7 @@ export interface DiscordConfig {
   webHookUrl: string;
   /**
    * @description you can use "here" and "everyone" to mention or set a userId or roleId to mention persons. note that don't pass @ in mention text
-   * @see  {@link https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID- Where can I find my User Server Message ID}
+   * @see  {@link https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID- Where can I find my User OR Role ID}
    * */
   mentionList?: Array<'here' | 'everyone' | string>;
 }
